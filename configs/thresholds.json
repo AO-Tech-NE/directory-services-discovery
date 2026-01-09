@@ -1,0 +1,9 @@
+{
+  "crypto": {
+    "rsa_min_bits": 2048
+  },
+  "identity": {
+    "recommended_min_password_length": 12
+  },
+  "notes": "Thresholds are advisory only. Discovery does not enforce or remediate."
+}

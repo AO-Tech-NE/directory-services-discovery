@@ -1,0 +1,6 @@
+{
+  "services": [],
+  "scheduled_tasks": [],
+  "certificate_subjects": [],
+  "notes": "Noise exclusions. Populate only after observing real environment behavior."
+}

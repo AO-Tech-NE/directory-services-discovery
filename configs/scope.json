@@ -1,0 +1,11 @@
+{
+  "mode": "dc",
+  "targets": [],
+  "include": {
+    "domain_controllers": true,
+    "active_directory": false,
+    "azure_ad": false,
+    "hybrid": false
+  },
+  "notes": "Define discovery scope and targets here. Empty targets implies local execution."
+}
