@@ -1,0 +1,16 @@
+$RepoRoot = "C:\Users\CheriLeichleiter\Github Repos\directory-services-discovery"
+
+$paths = @(
+    "reports\raw\.gitkeep",
+    "reports\normalized\.gitkeep",
+    "reports\summaries\.gitkeep"
+)
+
+foreach ($rel in $paths) {
+    $full = Join-Path $RepoRoot $rel
+    if (-not (Test-Path -LiteralPath $full)) {
+        New-Item -ItemType File -Path $full -Force | Out-Null
+    }
+}
+
+Write-Host "gitkeep files created."

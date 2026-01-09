@@ -1,0 +1,39 @@
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# =========================
+# PowerShell
+# =========================
+*.psd1.user
+*.psm1.user
+*.ps1.user
+
+# =========================
+# Logs / Temp
+# =========================
+*.log
+*.tmp
+
+# =========================
+# Discovery Outputs
+# =========================
+reports/raw/**
+reports/normalized/**
+reports/summaries/**
+
+# Allow folder structure to exist
+!reports/raw/.gitkeep
+!reports/normalized/.gitkeep
+!reports/summaries/.gitkeep
+
+# =========================
+# Secrets (defensive)
+# =========================
+*.env
+secrets.json
+credentials.json
