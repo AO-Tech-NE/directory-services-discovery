@@ -15,7 +15,7 @@ This repo is under active development. Do not assume modules are production-read
 ### DomainController
 - modules/DomainController/DC-Services.psm1 — Implemented (baseline, local validated)
 - modules/DomainController/DC-Certificates.psm1 — Implemented (local validated, DC validation pending)
-- modules/DomainController/DC-ScheduledTasks.psm1 — Stub
+- modules/DomainController/DC-ScheduledTasks.psm1 — Implemented (local validated, DC validation pending)
 - modules/DomainController/DC-SecurityBaseline.psm1 — Stub
 - modules/DomainController/DC-Dependencies.psm1 — Stub
 - modules/DomainController/DC-Health.psm1 — Stub

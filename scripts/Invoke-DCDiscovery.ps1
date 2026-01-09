@@ -30,11 +30,12 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 # Update this when you replace the file to prove what ran
-$ScriptBuild = "2026-01-09T1917Z"
+$ScriptBuild = "2026-01-09T1930Z"
 
 # --- Repo root + module imports (repo-relative) ---
 $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 Import-Module (Join-Path $RepoRoot "modules\DomainController\DC-Services.psm1") -Force
+Import-Module (Join-Path $RepoRoot "modules\DomainController\DC-ScheduledTasks.psm1") -Force
 
 function Ensure-Dir {
     param([Parameter(Mandatory = $true)][string]$Path)
@@ -169,7 +170,6 @@ function Get-LocalMachineCertificateInventory {
                 $certs = Get-ChildItem -Path $path -ErrorAction Stop
 
                 foreach ($certObj in $certs) {
-                    # Cast carefully (no throwing out of the function)
                     $cert = $null
                     try {
                         $cert = [System.Security.Cryptography.X509Certificates.X509Certificate2]$certObj
@@ -191,7 +191,6 @@ function Get-LocalMachineCertificateInventory {
                     $rsaBits = $null
                     $isWeakRsa = $false
 
-                    # PS5.1-friendly: OID check + PublicKey.Key.KeySize
                     try {
                         if ($null -ne $cert.PublicKey -and $null -ne $cert.PublicKey.Oid -and $cert.PublicKey.Oid.Value -eq $RSA_OID) {
                             $rsaBits = $cert.PublicKey.Key.KeySize
@@ -318,9 +317,36 @@ $boot = [datetime]::Parse($os.LastBootUpTime)
 $uptime = (Get-Date) - $boot
 
 $services = Get-DSDServiceInventory -ComputerName $Target
-
-# ---- Certificates (inline; schema-stable; cannot throw) ----
 $certificates = Get-LocalMachineCertificateInventory -ComputerName $Target -RsaMinBits $RsaMinBits -Stores @("Root","CA")
+
+# Scheduled tasks (module)
+$scheduled_tasks = $null
+try {
+    $scheduled_tasks = Get-DSDScheduledTaskInventory -ComputerName $Target
+} catch {
+    $scheduled_tasks = [pscustomobject]@{
+        schema_version  = "0.1"
+        computer_name   = $Target
+        captured_at_utc = $CapturedAtUtc
+        findings        = [pscustomobject]@{
+            failed_tasks        = @()
+            non_system_tasks    = @()
+            non_microsoft_tasks = @()
+        }
+        counts          = [pscustomobject]@{
+            total_tasks         = 0
+            failed_tasks        = 0
+            non_system_tasks    = 0
+            non_microsoft_tasks = 0
+        }
+        errors          = @([pscustomobject]@{
+            stage      = "collector"
+            error_type = $_.Exception.GetType().FullName
+            error      = $_.Exception.Message
+        })
+        status          = "skipped_or_failed"
+    }
+}
 
 $payload = [ordered]@{
     schema_version  = "0.1"
@@ -352,8 +378,9 @@ $payload = [ordered]@{
 
     thresholds = [ordered]@{ rsa_min_bits = $RsaMinBits }
 
-    services     = $services
-    certificates = $certificates
+    services        = $services
+    certificates    = $certificates
+    scheduled_tasks = $scheduled_tasks
 }
 
 # ---- Write outputs ----
